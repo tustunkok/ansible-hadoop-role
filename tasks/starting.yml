@@ -1,0 +1,24 @@
+---
+- name: Start HDFS NameNode
+  command: "{{ __hadoop_installation_dir }}/bin/hdfs --daemon start namenode"
+  when: "'namenode' in hostvars[inventory_hostname]"
+  args:
+    creates: /tmp/hadoop-hadoop-namenode.pid
+
+- name: Start HDFS DataNode
+  command: "{{ __hadoop_installation_dir }}/bin/hdfs --daemon start datanode"
+  when: "'datanode' in hostvars[inventory_hostname]"
+  args:
+    creates: /tmp/hadoop-hadoop-datanode.pid
+
+- name: Start YARN ResourceManager
+  command: "{{ __hadoop_installation_dir }}/bin/yarn --daemon start resourcemanager"
+  when: "'resourcemanager' in hostvars[inventory_hostname]"
+  args:
+    creates: /tmp/hadoop-hadoop-resourcemanager.pid
+
+- name: Start YARN NodeManager
+  command: "{{ __hadoop_installation_dir }}/bin/yarn --daemon start nodemanager"
+  when: "'nodemanager' in hostvars[inventory_hostname]"
+  args:
+    creates: /tmp/hadoop-hadoop-nodemanager.pid

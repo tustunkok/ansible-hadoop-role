@@ -1,0 +1,42 @@
+---
+- name: Create spark-env file
+  copy:
+    src: "{{ __spark_installation_dir }}/conf/spark-env.sh.template"
+    dest: "{{ __spark_installation_dir }}/conf/spark-env.sh"
+    remote_src: true
+
+- name: Create spark-defaults file
+  copy:
+    src: "{{ __spark_installation_dir }}/conf/spark-defaults.conf.template"
+    dest: "{{ __spark_installation_dir }}/conf/spark-defaults.conf"
+    remote_src: true
+
+- name: Set HADOOP_CONF_DIR variable in spark-env.sh file
+  ansible.builtin.lineinfile:
+    path: "{{ __spark_installation_dir }}/conf/spark-env.sh"
+    regexp: '^export HADOOP_CONF_DIR='
+    line: 'export HADOOP_CONF_DIR={{ __hadoop_installation_dir }}/etc/hadoop'
+
+- name: Set HADOOP_CONF_DIR variable in spark-env.sh file
+  ansible.builtin.lineinfile:
+    path: "{{ __spark_installation_dir }}/conf/spark-env.sh"
+    regexp: '^export HADOOP_CONF_DIR='
+    line: 'export HADOOP_CONF_DIR={{ __hadoop_installation_dir }}/etc/hadoop'
+
+- name: Set SPARK_DIST_CLASSPATH variable in spark-env.sh file
+  ansible.builtin.lineinfile:
+    path: "{{ __spark_installation_dir }}/conf/spark-env.sh"
+    regexp: '^export SPARK_DIST_CLASSPATH='
+    line: 'export SPARK_DIST_CLASSPATH=$({{ __hadoop_installation_dir }}/bin/hadoop classpath)'
+
+- name: Set spark default master variable in spark-defaults.conf file
+  ansible.builtin.lineinfile:
+    path: "{{ __spark_installation_dir }}/conf/spark-defaults.conf"
+    regexp: '^spark.master'
+    line: 'spark.master yarn'
+
+- name: Set spark default driver memory variable in spark-defaults.conf file
+  ansible.builtin.lineinfile:
+    path: "{{ __spark_installation_dir }}/conf/spark-defaults.conf"
+    regexp: '^spark.driver.memory'
+    line: 'spark.driver.memory 1g'

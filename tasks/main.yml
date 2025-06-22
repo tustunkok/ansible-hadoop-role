@@ -1,0 +1,25 @@
+---
+- include_vars: paths.yml
+
+- name: Install prerequisite packages
+  import_tasks: prerequisites.yml
+
+- name: Determine the next task based on the "state" variable
+  include_tasks: "{{ state }}"
+  when: state is defined and state != 'present'
+
+- name: Include installation tasks if state is present
+  block:
+    - name: Install Hadoop packages
+      import_tasks: install.yml
+
+    - name: Configure Hadoop
+      import_tasks: configure.yml
+      become: yes
+      become_user: hadoop
+
+    - name: Starting Hadoop
+      import_tasks: starting.yml
+      become: yes
+      become_user: hadoop
+  when: state == 'present'

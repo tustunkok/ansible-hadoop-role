@@ -1,0 +1,28 @@
+---
+- name: Check for existing Spark installation
+  stat:
+    path: "{{ __spark_installation_dir }}"
+  register: spark_stat
+
+- name: Download Spark tarball if not already installed
+  get_url:
+    url: https://dlcdn.apache.org/spark/spark-3.5.6/spark-3.5.6-bin-without-hadoop.tgz
+    dest: /tmp/spark-3.5.6-bin-without-hadoop.tgz
+  when: not spark_stat.stat.exists
+
+- name: Extract Spark to /opt if not already installed
+  unarchive:
+    src: /tmp/spark-3.5.6-bin-without-hadoop.tgz
+    dest: /opt/
+    remote_src: yes
+    owner: hadoop
+    group: hadoop
+  when: not spark_stat.stat.exists
+
+- name: Create a symbolic link for Hadoop in /opt
+  file:
+    src: /opt/spark-3.5.6-bin-without-hadoop
+    dest: "{{ __spark_installation_dir }}"
+    state: link
+    owner: hadoop
+    group: hadoop

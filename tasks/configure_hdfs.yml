@@ -1,0 +1,22 @@
+---
+- name: Define new properties to be added or updated in hdfs-site.xml
+  set_fact:
+    new_properties:
+      dfs.namenode.name.dir: "{{ __hadoop_base_data_dir }}/dfs/name"
+      dfs.blocksize: 268435456
+      dfs.namenode.handler.count: 100
+      dfs.datanode.data.dir: "{{ __hadoop_base_data_dir }}/dfs/data"
+
+- name: Remove existing properties if they exist
+  lineinfile:
+    path: "{{ __hadoop_installation_dir }}/etc/hadoop/hdfs-site.xml"
+    regexp: '<property><name>{{ item.key }}</name>'
+    state: absent
+  loop: "{{ new_properties | dict2items }}"
+
+- name: Add the new properties to hdfs-site.xml
+  lineinfile:
+    path: "{{ __hadoop_installation_dir }}/etc/hadoop/hdfs-site.xml"
+    insertafter: '<configuration>'
+    line: '  <property><name>{{ item.key }}</name><value>{{ item.value }}</value></property>'
+  loop: "{{ new_properties | dict2items }}"

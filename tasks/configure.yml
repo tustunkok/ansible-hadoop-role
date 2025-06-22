@@ -1,0 +1,43 @@
+---
+- name: Generate SSH private key for master nodes
+  command: ssh-keygen -t rsa -b 2048 -f /home/hadoop/.ssh/id_rsa -q -N ""
+  delegate_to: "{{ groups['master'][0] }}"
+  run_once: true
+  args:
+    creates: /home/hadoop/.ssh/id_rsa
+
+- name: Fetch the key pair from the first master node
+  fetch:
+    src: "{{ item }}"
+    dest: /tmp/
+    flat: yes
+  loop:
+    - /home/hadoop/.ssh/id_rsa.pub
+    - /home/hadoop/.ssh/id_rsa
+  when: inventory_hostname in groups['master'][0]
+
+- name: Distribute SSH private key to all master nodes
+  copy:
+    src: "/tmp/id_rsa"
+    dest: /home/hadoop/.ssh/id_rsa
+    mode: '0600'
+  when: inventory_hostname != groups['master'][0] and inventory_hostname in groups['master']
+
+- name: Distribute SSH public key to all nodes
+  authorized_key:
+    user: hadoop
+    state: present
+    key: "{{ lookup('file', '/tmp/id_rsa.pub') }}"
+
+- import_tasks: configure_hadoop.yml
+- import_tasks: configure_hdfs.yml
+- import_tasks: configure_yarn.yml
+
+- name: Initiate HDFS for the first time setup
+  command: "{{ __hadoop_installation_dir }}/bin/hdfs namenode -format"
+  args:
+    creates: "{{ __hadoop_base_data_dir }}/dfs/name"
+  when: "'namenode' in hostvars[inventory_hostname]"
+
+- import_tasks: configure_spark.yml
+  when: "hadoop_install_spark is true"

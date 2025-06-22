@@ -1,0 +1,22 @@
+---
+- name: Define new properties to be added or updated in yarn-site.xml
+  set_fact:
+    new_properties:
+      yarn.acl.enable: "false"
+      yarn.resourcemanager.hostname: "{{ groups['master'][0] }}"
+      yarn.nodemanager.resource.memory-mb: 2048
+
+- name: Remove existing properties if they exist
+  lineinfile:
+    path: "{{ __hadoop_installation_dir }}/etc/hadoop/yarn-site.xml"
+    regexp: '<property><name>{{ item.key }}</name>'
+    state: absent
+  loop: "{{ new_properties | dict2items }}"
+
+- name: Add the new properties to yarn-site.xml
+  lineinfile:
+    path: "{{ __hadoop_installation_dir }}/etc/hadoop/yarn-site.xml"
+    insertafter: '<configuration>'
+    line: '  <property><name>{{ item.key }}</name><value>{{ item.value }}</value></property>'
+    line: '  <property><name>{{ item.key }}</name><value>{{ item.value }}</value></property>'
+  loop: "{{ new_properties | dict2items }}"

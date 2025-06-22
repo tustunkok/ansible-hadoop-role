@@ -1,0 +1,36 @@
+---
+- name: Ensure prerequisite packages are installed (Ubuntu)
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - wget
+    - openjdk-11-jdk
+    - tar
+    - python3-lxml
+  when: ansible_facts['distribution'] == 'Ubuntu'
+
+- name: Ensure prerequisite packages are installed (RHEL compatible distributions)
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - wget
+    - java-11-openjdk-devel
+    - tar
+    - python3-lxml
+  when: ansible_os_family == "RedHat"
+
+- name: Create hadoop users
+  ansible.builtin.user:
+    name: hadoop
+    state: present
+    home: /home/hadoop
+    system: yes
+
+- name: Create a temporary directory /data01 (to be replaced with a disk mount)
+  file:
+    path: /data01
+    state: directory
+    owner: hadoop
+    group: hadoop

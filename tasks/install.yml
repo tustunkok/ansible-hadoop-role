@@ -1,0 +1,57 @@
+---
+- name: Ensure /opt directory exists
+  file:
+    path: /opt
+    state: directory
+
+- name: Check for existing Hadoop installation
+  stat:
+    path: "{{ __hadoop_installation_dir }}"
+  register: hadoop_stat
+
+- name: Download Hadoop tarball if not already installed
+  get_url:
+    url: https://dlcdn.apache.org/hadoop/common/hadoop-3.4.1/hadoop-3.4.1.tar.gz
+    dest: /tmp/hadoop-3.4.1.tar.gz
+  when: not hadoop_stat.stat.exists
+    
+- name: Extract Hadoop to /opt if not already installed
+  unarchive:
+    src: /tmp/hadoop-3.4.1.tar.gz
+    dest: /opt/
+    remote_src: yes
+    owner: hadoop
+    group: hadoop
+  when: not hadoop_stat.stat.exists
+
+- name: Create a symbolic link for Hadoop in /opt
+  file:
+    src: /opt/hadoop-3.4.1
+    dest: "{{ __hadoop_installation_dir }}"
+    state: link
+    owner: hadoop
+    group: hadoop
+
+- name: Create HADOOP_HOME environment variable script
+  copy:
+    dest: /etc/profile.d/hadoop.sh
+    content: |
+      # This file is part of Ansible managed setup.
+      export HADOOP_HOME=/opt/hadoop
+
+- name: Ensure the script has proper permissions
+  file:
+    path: /etc/profile.d/hadoop.sh
+    mode: '0644'
+
+- name: Manipulate /etc/hosts file with blockinfile
+  blockinfile:
+    path: /etc/hosts
+    block: |
+      # Hadoop nodes
+      192.168.1.109 prd-ank-hdp01 prd-ank-hdp01.home
+      192.168.1.110 prd-ank-dtn01 prd-ank-dtn01.home
+      192.168.1.112 prd-ank-edg01 prd-ank-edg01.home
+
+- import_tasks: install_spark.yml
+  when: "hadoop_install_spark is true"
