@@ -11,19 +11,16 @@
     dest: "{{ __spark_installation_dir }}/conf/spark-defaults.conf"
     remote_src: true
 
-- name: Set HADOOP_CONF_DIR variable in spark-env.sh file
+- name: Set environment variables in spark-env.sh file
   ansible.builtin.lineinfile:
     path: "{{ __spark_installation_dir }}/conf/spark-env.sh"
-    regexp: '^export HADOOP_CONF_DIR='
-    line: 'export HADOOP_CONF_DIR={{ __hadoop_installation_dir }}/etc/hadoop'
+    regexp: '^export {{ item.conf }}='
+    line: 'export {{ item.conf }}={{ item.value }}'
+  loop:
+    - { 'conf': 'HADOOP_CONF_DIR', 'value': '{{ __hadoop_installation_dir }}/etc/hadoop' }
+    - { 'conf': 'SPARK_DIST_CLASSPATH', 'value': '$({{ __hadoop_installation_dir }}/bin/hadoop classpath)' }
 
-- name: Set SPARK_DIST_CLASSPATH variable in spark-env.sh file
-  ansible.builtin.lineinfile:
-    path: "{{ __spark_installation_dir }}/conf/spark-env.sh"
-    regexp: '^export SPARK_DIST_CLASSPATH='
-    line: 'export SPARK_DIST_CLASSPATH=$({{ __hadoop_installation_dir }}/bin/hadoop classpath)'
-
-- name: Set spark default driver memory variable in spark-defaults.conf file
+- name: Set spark default variables in spark-defaults.conf file
   ansible.builtin.lineinfile:
     path: "{{ __spark_installation_dir }}/conf/spark-defaults.conf"
     regexp: '^{{ item.conf }}'
@@ -35,4 +32,4 @@
     - { 'conf': 'spark.executor.cores  ', 'value': '1' }
     - { 'conf': 'spark.executor.instances  ', 'value': '1' }
     - { 'conf': 'spark.driver.cores', 'value': '1' }
-    - { 'conf': 'spark.deploy.mode', 'value': 'client' }
+    - { 'conf': 'spark.deploy.mode', 'value': 'cluster' }
