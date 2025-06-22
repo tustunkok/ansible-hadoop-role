@@ -7,7 +7,6 @@
     - wget
     - openjdk-11-jdk
     - tar
-    - python3-lxml
   when: ansible_facts['distribution'] == 'Ubuntu'
 
 - name: Ensure prerequisite packages are installed (RHEL compatible distributions)
@@ -18,7 +17,6 @@
     - wget
     - java-11-openjdk-devel
     - tar
-    - python3-lxml
   when: ansible_os_family == "RedHat"
 
 - name: Create hadoop users
