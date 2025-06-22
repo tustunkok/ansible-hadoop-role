@@ -1,14 +1,4 @@
 ---
-- name: Ensure prerequisite packages are installed (Ubuntu)
-  apt:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - wget
-    - openjdk-11-jdk
-    - tar
-  when: ansible_facts['distribution'] == 'Ubuntu'
-
 - name: Ensure prerequisite packages are installed (RHEL compatible distributions)
   yum:
     name: "{{ item }}"

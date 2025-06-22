@@ -2,9 +2,9 @@
 - name: Define new properties to be added or updated in yarn-site.xml
   set_fact:
     new_properties:
-      yarn.acl.enable: "false"
       yarn.resourcemanager.hostname: "{{ groups['master'][0] }}"
-      yarn.nodemanager.resource.memory-mb: 2048
+      yarn.nodemanager.resource.memory-mb: 3072
+      yarn.nodemanager.resource.cpu-vcores: 4
 
 - name: Remove existing properties if they exist
   lineinfile:
