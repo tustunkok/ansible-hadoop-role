@@ -6,6 +6,7 @@
     removes: /tmp/hadoop-yarn-nodemanager.pid
   become: true
   become_user: yarn
+  become_method: su
 
 - name: Stop YARN ResourceManager
   command: "{{ __hadoop_installation_dir }}/bin/yarn --daemon stop resourcemanager"
@@ -14,6 +15,7 @@
     removes: /tmp/hadoop-yarn-resourcemanager.pid
   become: true
   become_user: yarn
+  become_method: su
 
 - name: Stop HDFS DataNodes
   command: "{{ __hadoop_installation_dir }}/bin/hdfs --daemon stop datanode"
@@ -22,6 +24,7 @@
     removes: /tmp/hadoop-hdfs-datanode.pid
   become: true
   become_user: hdfs
+  become_method: su
 
 - name: Stop HDFS NameNode
   command: "{{ __hadoop_installation_dir }}/bin/hdfs --daemon stop namenode"
@@ -30,3 +33,4 @@
     removes: /tmp/hadoop-hdfs-namenode.pid
   become: true
   become_user: hdfs
+  become_method: su
