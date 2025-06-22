@@ -38,6 +38,8 @@
   args:
     creates: "{{ __hadoop_base_data_dir }}/dfs/name"
   when: "'namenode' in hostvars[inventory_hostname]"
+  become: true
+  become_user: hdfs
 
 - import_tasks: configure_spark.yml
   when: "hadoop_install_spark is true"

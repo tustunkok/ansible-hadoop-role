@@ -17,6 +17,7 @@
     remote_src: yes
     owner: hadoop
     group: hadoop
+    mode: 'g+w'
   when: not spark_stat.stat.exists
 
 - name: Create a symbolic link for Hadoop in /opt

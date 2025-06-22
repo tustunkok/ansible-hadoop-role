@@ -18,5 +18,4 @@
     path: "{{ __hadoop_installation_dir }}/etc/hadoop/yarn-site.xml"
     insertafter: '<configuration>'
     line: '  <property><name>{{ item.key }}</name><value>{{ item.value }}</value></property>'
-    line: '  <property><name>{{ item.key }}</name><value>{{ item.value }}</value></property>'
   loop: "{{ new_properties | dict2items }}"

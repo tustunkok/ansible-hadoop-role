@@ -1,0 +1,32 @@
+---
+- name: Stop YARN NodeManagers
+  command: "{{ __hadoop_installation_dir }}/bin/yarn --daemon stop nodemanager"
+  when: "'nodemanager' in hostvars[inventory_hostname]"
+  args:
+    removes: /tmp/hadoop-yarn-nodemanager.pid
+  become: true
+  become_user: yarn
+
+- name: Stop YARN ResourceManager
+  command: "{{ __hadoop_installation_dir }}/bin/yarn --daemon stop resourcemanager"
+  when: "'resourcemanager' in hostvars[inventory_hostname]"
+  args:
+    removes: /tmp/hadoop-yarn-resourcemanager.pid
+  become: true
+  become_user: yarn
+
+- name: Stop HDFS DataNodes
+  command: "{{ __hadoop_installation_dir }}/bin/hdfs --daemon stop datanode"
+  when: "'datanode' in hostvars[inventory_hostname]"
+  args:
+    removes: /tmp/hadoop-hdfs-datanode.pid
+  become: true
+  become_user: hdfs
+
+- name: Stop HDFS NameNode
+  command: "{{ __hadoop_installation_dir }}/bin/hdfs --daemon stop namenode"
+  when: "'namenode' in hostvars[inventory_hostname]"
+  args:
+    removes: /tmp/hadoop-hdfs-namenode.pid
+  become: true
+  become_user: hdfs

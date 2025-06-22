@@ -5,11 +5,14 @@
   import_tasks: prerequisites.yml
 
 - name: Determine the next task based on the "state" variable
-  include_tasks: "{{ state }}"
+  include_tasks: "{{ state }}.yml"
   when: state is defined and state != 'present'
 
 - name: Include installation tasks if state is present
   block:
+    - name: Stop the services if running
+      import_tasks: stopping.yml
+
     - name: Install Hadoop packages
       import_tasks: install.yml
 
@@ -20,6 +23,4 @@
 
     - name: Starting Hadoop
       import_tasks: starting.yml
-      become: yes
-      become_user: hadoop
   when: state == 'present'

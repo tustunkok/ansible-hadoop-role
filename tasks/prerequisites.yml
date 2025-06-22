@@ -21,10 +21,17 @@
 
 - name: Create hadoop users
   ansible.builtin.user:
-    name: hadoop
+    name: "{{ item }}"
     state: present
-    home: /home/hadoop
+    home: "/home/{{ item }}"
     system: yes
+    groups:
+      - hadoop
+    append: true
+  loop:
+    - hadoop
+    - hdfs
+    - yarn
 
 - name: Create a temporary directory /data01 (to be replaced with a disk mount)
   file:
@@ -32,3 +39,4 @@
     state: directory
     owner: hadoop
     group: hadoop
+    mode: 'g+w'

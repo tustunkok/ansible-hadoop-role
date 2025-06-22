@@ -22,6 +22,7 @@
     remote_src: yes
     owner: hadoop
     group: hadoop
+    mode: 'g+w'
   when: not hadoop_stat.stat.exists
 
 - name: Create a symbolic link for Hadoop in /opt
@@ -31,6 +32,14 @@
     state: link
     owner: hadoop
     group: hadoop
+
+- name: Set correct permissions for the logs directory
+  file:
+    path: "{{ __hadoop_installation_dir }}/logs"
+    state: directory
+    owner: hadoop
+    group: hadoop
+    mode: 'g+w'
 
 - name: Create HADOOP_HOME environment variable script
   copy:
